@@ -190,4 +190,177 @@ async function init(){
 function renderConsonants(){
   const grid = document.getElementById('consonant-grid');
   consonants.forEach(c=>{
-    const btn =
+    const btn = document.createElement('button');
+    btn.className = `letter-btn bg-white border p-1 rounded text-lg tone-${c.type}`;
+    btn.textContent = c.ch;
+    btn.onclick = ()=>{ currentChar = c.ch; updateCharInfo(c); speak(c.ch); };
+    grid.appendChild(btn);
+  });
+}
+
+// ===== 渲染32元音 =====
+function renderVowels(){
+  const grid = document.getElementById('vowel-grid');
+  vowels.forEach(v=>{
+    const btn = document.createElement('button');
+    btn.className = 'letter-btn bg-white border p-1 rounded text-sm';
+    btn.textContent = v.ch;
+    btn.onclick = ()=>{ currentChar = v.ch; updateCharInfo(v); speak(v.ch.replace('-','ก')); };
+    grid.appendChild(btn);
+  });
+}
+
+function updateCharInfo(obj){
+  document.getElementById('current-char').textContent = obj.ch;
+  document.getElementById('current-info').textContent = `${obj.name || ''} ${obj.sound || ''} ${obj.eg || ''}`;
+}
+
+function switchTab(name){
+  document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+// ===== 手写板 =====
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+let drawing = false;
+canvas.onmousedown = e=>{drawing=true; ctx.beginPath(); ctx.moveTo(e.offsetX,e.offsetY);}
+canvas.onmousemove = e=>{if(drawing){ctx.lineTo(e.offsetX,e.offsetY); ctx.stroke();}}
+canvas.onmouseup = ()=>{drawing=false; speak(currentChar);}
+canvas.ontouchstart = e=>{drawing=true; const t=e.touches[0]; const r=canvas.getBoundingClientRect(); ctx.beginPath(); ctx.moveTo(t.clientX-r.left,t.clientY-r.top);}
+canvas.ontouchmove = e=>{if(drawing){const t=e.touches[0]; const r=canvas.getBoundingClientRect(); ctx.lineTo(t.clientX-r.left,t.clientY-r.top); ctx.stroke();}}
+canvas.ontouchend = ()=>{drawing=false; speak(currentChar);}
+function clearCanvas(){ctx.clearRect(0,0,canvas.width,canvas.height);}
+
+// ===== 单词/句子/阅读/菜单/7-11/打卡模块，代码同v3.1，省略=======
+// 为节省篇幅，这里用注释代替，实际你复制时要把v3.1里对应函数全贴上
+function renderWords(){
+  const list = document.getElementById('word-list');
+  list.innerHTML = '';
+  words.forEach(w=>{
+    const div = document.createElement('div');
+    div.className = 'bg-white p-2 rounded shadow flex justify-between items-center';
+    div.innerHTML = `<div><div class="font-bold">${w.th}</div><div class="text-xs text-gray-500">${w.rt} | ${w.zh}</div></div>
+                     <button onclick="speakWord('${w.th}','${w.mp3||''}')" class="bg-blue-100 px-2 py-1 rounded">🔊</button>`;
+    list.appendChild(div);
+  });
+}
+function renderSentence(){
+  const [th,rt,zh] = sentences[0].split('|');
+  document.getElementById('sentence-box').innerHTML = `<div class="text-lg">${th}</div><div class="text-sm text-gray-500">${rt}</div><div>${zh}</div>`;
+}
+renderSentence();
+function speakSentence(){ speak(sentences[0].split('|')[0]); }
+async function toggleRecord(){
+  const btn = document.getElementById('rec-btn');
+  if(!mediaRecorder){
+    const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+    mediaRecorder = new MediaRecorder(stream);
+    mediaRecorder.ondataavailable = e=>audioChunks.push(e.data);
+    mediaRecorder.onstop = ()=>{
+      const blob = new Blob(audioChunks,{type:'audio/webm'});
+      document.getElementById('user-audio').src = URL.createObjectURL(blob);
+      document.getElementById('user-audio').classList.remove('hidden');
+      audioChunks = [];
+    }
+  }
+  if(mediaRecorder.state === 'inactive'){
+    mediaRecorder.start(); btn.textContent = '⏹ 停止'; btn.classList.replace('bg-red-500','bg-gray-500');
+  } else {
+    mediaRecorder.stop(); btn.textContent = '🎤 录音'; btn.classList.replace('bg-gray-500','bg-red-500');
+  }
+}
+function randomSentence(){
+  const idx = Math.floor(Math.random()*sentences.length);
+  const [th,rt,zh] = sentences[idx].split('|');
+  const words = th.split(' ');
+  document.getElementById('read-sentence').innerHTML = words.map(w=>`<span class="word-span" onclick="speak('${w}')">${w}</span>`).join(' ') + `<div class="text-sm text-gray-500 mt-2">${rt}</div><div>${zh}</div>`;
+  window.currentReadTh = th;
+}
+function speakFullSentence(){ speak(window.currentReadTh); }
+function renderRayong(){
+  const list = document.getElementById('rayong-list');
+  rayongData.forEach(item=>{
+    const div = document.createElement('div');
+    div.className = 'bg-white p-2 rounded shadow flex justify-between';
+    div.innerHTML = `<div>${item.emoji} <b>${item.th}</b> ${item.zh} <span class="text-xs text-gray-500">${item.rt} | ${item.price}</span></div>
+                     <button onclick="speak('${item.th}')" class="bg-orange-100 px-2 py-1 rounded">🔊</button>`;
+    list.appendChild(div);
+  });
+}
+function showRayongDialogue(){
+  document.getElementById('rayong-dialogue').classList.remove('hidden');
+  document.getElementById('rayong-dialogue').innerHTML = `
+    <div onclick="speak('เอา ข้าวมันไก่ หนึ่งจานครับ')" class="cursor-pointer">你：เอา ข้าวมันไก่ หนึ่งจานครับ<br><span class="text-xs text-gray-500">要一份海南鸡饭</span></div>
+    <div onclick="speak('ได้ครับ 50 บาท')" class="cursor-pointer mt-2">老板：ได้ครับ 50 บาท<br><span class="text-xs text-gray-500">好的，50泰铢</span></div>
+  `;
+}
+function renderSeven(){
+  const list = document.getElementById('seven-list');
+  sevenData.forEach(item=>{
+    const div = document.createElement('div');
+    div.className = 'bg-white p-2 rounded shadow flex justify-between';
+    div.innerHTML = `<div>${item.emoji} <b>${item.th}</b> ${item.zh} <span class="text-xs text-gray-500">${item.rt} | ${item.price}</span></div>
+                     <button onclick="speak('${item.th}')" class="bg-green-100 px-2 py-1 rounded">🔊</button>`;
+    list.appendChild(div);
+  });
+}
+function showSevenDialogue(){
+  document.getElementById('seven-dialogue').classList.remove('hidden');
+  document.getElementById('seven-dialogue').innerHTML = `
+    <div onclick="speak('คิดเงินด้วยครับ')" class="cursor-pointer">你：คิดเงินด้วยครับ<br><span class="text-xs text-gray-500">结账</span></div>
+    <div onclick="speak('ทั้งหมด 78 บาทครับ')" class="cursor-pointer mt-2">店员：ทั้งหมด 78 บาทครับ<br><span class="text-xs text-gray-500">一共78泰铢</span></div>
+    <div onclick="speak('สแกนจ่ายได้ไหม')" class="cursor-pointer mt-2">你：สแกนจ่ายได้ไหม<br><span class="text-xs text-gray-500">能扫码支付吗</span></div>
+  `;
+}
+function loadTodayScore(){
+  const today = new Date().toDateString();
+  const saved = JSON.parse(localStorage.getItem('thai-score')||'{}');
+  todayScore = saved[today] || 0;
+  updateScoreBar();
+}
+function updateScoreBar(){
+  document.getElementById('today-score').textContent = todayScore;
+  document.getElementById('score-bar').style.width = Math.min(todayScore*2,100)+'%';
+  if(todayScore<50) document.getElementById('lock-msg').classList.remove('hidden');
+  else document.getElementById('lock-msg').classList.add('hidden');
+}
+function loadQuiz(){
+  const quiz = words.sort(()=>0.5-Math.random()).slice(0,5);
+  const box = document.getElementById('quiz-box');
+  box.innerHTML = '<h3 class="font-bold mb-2">今日闯关：5题对3题才及格</h3>';
+  quiz.forEach((q,i)=>{
+    const options = [...words].sort(()=>0.5-Math.random()).slice(0,3).map(w=>w.zh);
+    if(!options.includes(q.zh)) options[0] = q.zh;
+    box.innerHTML += `<div class="mb-2">${i+1}. ${q.th}
+      <select onchange="checkAns(this,'${q.zh}')" class="border rounded">
+        <option>选择</option>${options.map(o=>`<option>${o}</option>`).join('')}
+      </select></div>`;
+  });
+}
+function checkAns(select,correct){
+  if(select.value===correct){
+    select.className='border-green-500 bg-green-50';
+    todayScore+=10;
+    const today = new Date().toDateString();
+    const saved = JSON.parse(localStorage.getItem('thai-score')||'{}');
+    saved[today] = todayScore;
+    localStorage.setItem('thai-score',JSON.stringify(saved));
+    updateScoreBar();
+  } else {
+    select.className='border-red-500 bg-red-50';
+  }
+}
+function speak(text){
+  if(!text) return;
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'th-TH';
+  speechSynthesis.speak(utter);
+}
+function speakWord(th,mp3){
+  if(mp3){ new Audio(mp3).play(); }
+  else { speak(th); }
+}
+</script>
+</body>
+</html>
