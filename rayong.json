@@ -1,0 +1,12 @@
+[
+  {"th":"ข้าวมันไก่","rt":"kâao man gài","zh":"海南鸡饭","price":"40-50฿","emoji":"🍗"},
+  {"th":"ส้มตำ","rt":"sôm dtam","zh":"木瓜沙拉","price":"40฿","emoji":"🥗"},
+  {"th":"ไก่ย่าง","rt":"gài yâang","zh":"烤鸡","price":"半只80฿","emoji":"🍖"},
+  {"th":"คอหมูย่าง","rt":"kor mǔu yâang","zh":"烤猪颈肉","price":"100฿","emoji":"🥩"},
+  {"th":"ต้มยำกุ้ง","rt":"dtôm yam gûng","zh":"冬阴功汤","price":"80-120฿","emoji":"🍤"},
+  {"th":"ผัดไทย","rt":"pàt tai","zh":"泰式炒河粉","price":"50฿","emoji":"🍜"},
+  {"th":"ข้าวเหนียวมะม่วง","rt":"kâao nǐeow má-mûang","zh":"芒果糯米饭","price":"60฿","emoji":"🥭"},
+  {"th":"หมูปิ้ง","rt":"mǔu bpîng","zh":"烤猪肉串","price":"10฿/串","emoji":"🍢"},
+  {"th":"ปลาเผา","rt":"bplaa pǎo","zh":"盐烤鱼","price":"180฿","emoji":"🐟"},
+  {"th":"ยำวุ้นเส้น","rt":"yam wún sên","zh":"凉拌粉丝","price":"60฿","emoji":"🥣"}
+]
