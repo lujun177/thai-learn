@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>20条保命包 - 真人版</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-black text-white min-h-screen">
+<div class="max-w-md mx-auto p-4">
+  <div class="flex justify-between items-center mb-4">
+    <h1 class="text-xl font-bold">🚨 20条保命包 真人版</h1>
+    <a href="index.html" class="bg-gray-700 px-3 py-1 rounded text-sm">返回学习</a>
+  </div>
+  <p class="text-xs text-gray-400 mb-3">点卡片直接外放给泰国人听，男声=长句/警察，女声=短句/点餐</p>
+  <div id="list" class="grid grid-cols-1 gap-2"></div>
+</div>
+
+<script>
+const data = [
+["สวัสดี","你好","打招呼"],["ขอบคุณ","谢谢","感谢"],["เท่าไหร่","多少钱","通用问价"],
+["ไปพัทยา เท่าไหร่","去芭提雅多少钱","坐双条车"],["ลดได้ไหม","能便宜吗","砍价"],
+["ใบขับขี่สากล ใช้ได้ไหม","国际驾照能用吗","被警察拦"],["ขอโทษครับ","对不起","道歉"],
+["ข้าวมันไก่","鸡油饭","饭店点餐"],["ส้มตำ","木瓜沙拉","饭店"],["น้ำเปล่า","白水","饭店/7-11"],
+["คิดเงินด้วย","买单","饭店/市场"],["จอดตรงนี้ครับ","停这里","打车/双条"],
+["เช่ามอเตอร์ไซค์ วันละเท่าไหร่","租摩托一天多少","租车"],["เติมน้ำมัน 100 บาท","加100铢油","加油站"],
+["ห้องน้ำอยู่ไหนครับ","厕所在哪","问路"],["อันนี้เท่าไหร่","这个多少","市场"],["ไปตลาดระยองยังไง","去罗勇市场怎么去","问路"],
+["ไม่เผ็ดครับ","不要辣","点餐必说"],["เอาอันนี้ครับ","要这个","指着说"],["มีห้องว่างไหมครับ","有空房吗","订房"]
+];
+
+const list = document.getElementById('list');
+data.forEach(([th,zh,tag],i)=>{
+  const div = document.createElement('div');
+  div.className = 'bg-zinc-900 border border-zinc-800 p-3 rounded-xl flex justify-between items-center active:bg-zinc-800';
+  div.innerHTML = `
+    <div class="flex-1">
+      <div class="flex gap-2 items-center"><span class="text- bg-green-600 px-1.5 py-0.5 rounded">${String(i+1).padStart(2,'0')}</span><span class="text- text-zinc-400">${tag}</span></div>
+      <div class="font-bold text-lg mt-1">${th}</div>
+      <div class="text-sm text-zinc-400">${zh}</div>
+    </div>
+    <button class="w-12 h-12 bg-white text-black rounded-full text-xl">▶</button>
+  `;
+  div.onclick = ()=> speak(th);
+  list.appendChild(div);
+});
+
+function speak(text){
+  const url = `audio/${encodeURIComponent(text)}.mp3`;
+  const audio = new Audio(url);
+  audio.play().catch(()=>{
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang='th-TH'; u.rate=0.9;
+    speechSynthesis.speak(u);
+  });
+}
+</script>
+</body>
+</html>
