@@ -1,0 +1,12 @@
+[
+  {"th":"น้ำเปล่า","rt":"náam bplào","zh":"矿泉水","price":"7฿","emoji":"💧"},
+  {"th":"นมสด","rt":"nom sòt","zh":"鲜牛奶","price":"13฿","emoji":"🥛"},
+  {"th":"ขนมปัง","rt":"kà-nǒm bpang","zh":"面包","price":"10-25฿","emoji":"🍞"},
+  {"th":"บะหมี่กึ่งสำเร็จรูป","rt":"bà-mìi gèung sǎm-rèt rûup","zh":"泡面","price":"6-15฿","emoji":"🍜"},
+  {"th":"กาแฟกระป๋อง","rt":"gaa-fae grà-bpǒng","zh":"罐装咖啡","price":"15฿","emoji":"☕"},
+  {"th":"ยาดม","rt":"yaa dom","zh":"鼻通","price":"20฿","emoji":"🌿"},
+  {"th":"ทิชชู่","rt":"tít-chûu","zh":"纸巾","price":"10฿","emoji":"🧻"},
+  {"th":"ข้าวกล่อง","rt":"kâao glɔ̀ng","zh":"盒饭","price":"35-45฿","emoji":"🍱"},
+  {"th":"ไส้กรอก","rt":"sâi grɔ̀ɔk","zh":"香肠","price":"15฿","emoji":"🌭"},
+  {"th":"โอวัลติน","rt":"oo-wan-dtin","zh":"阿华田","price":"13฿","emoji":"🍫"}
+]
