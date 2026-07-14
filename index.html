@@ -1,63 +1,134 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>泰语保命20句 - 罗勇版</title>
-<style>
-body{font-family:system-ui;background:#0f172a;color:#fff;padding:20px}
-.card{background:#1e293b;padding:16px;border-radius:12px;margin:10px 0;display:flex;justify-content:space-between;align-items:center}
-.th{font-size:20px;font-weight:bold}
-.zh{color:#94a3b8}
-button{background:#22c55e;border:0;padding:10px 16px;border-radius:8px;font-size:16px}
-button:active{transform:scale(0.95)}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thai 零基础 - Rayong版 v3.2 + 20保命包</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+ .tab-content { display: none; }
+ .tab-content.active { display: block; }
+ .word-span { cursor: pointer; padding: 0 2px; border-radius: 3px; }
+ .word-span:hover { background: #dbeafe; }
+ .letter-btn { font-family: 'Noto Sans Thai', sans-serif; }
+ .tone-low{color:#3b82f6}.tone-mid{color:#10b981}.tone-high{color:#ef4444}
+  </style>
 </head>
-<body>
-<h1>🇹🇭 罗勇保命20句 - 真人发音版</h1>
-<div id="list"></div>
+<body class="bg-gray-50 text-gray-800">
+  <div class="max-w-md mx-auto min-h-screen flex flex-col">
+    <header class="bg-blue-600 text-white p-4 text-center font-bold text-lg">
+      🇹🇭 Thai 零基础 - 44辅音+32元音 + 20保命包
+    </header>
+
+    <main id="main" class="flex-1 p-4 pb-20 overflow-y-auto">
+      <!-- 0. 20保命包置顶 -->
+      <div class="bg-green-600 text-white p-3 rounded-lg mb-4">
+        <h2 class="font-bold text-lg">🚨 罗勇保命20句 - 真人发音</h2>
+        <p class="text-xs opacity-80">点▶️直接放真人MP3，交警/司机听得懂</p>
+      </div>
+      <div id="emergency-list" class="space-y-2 mb-6"></div>
+
+      <!-- 字母 Tab -->
+      <div id="tab-letter" class="tab-content active">
+        <h2 class="text-xl font-bold mb-2">字母支柱 - 辅音 Consonants</h2>
+        <div class="text-xs text-gray-500 mb-2">
+          <span class="text-green-600">■中辅音9个</span>
+          <span class="text-red-500">■高辅音10个</span>
+          <span class="text-blue-500">■低辅音25个</span>
+        </div>
+        <div id="consonant-grid" class="grid grid-cols-5 gap-1 text-center mb-4"></div>
+        <h2 class="text-xl font-bold mb-2">元音 Vowels</h2>
+        <div id="vowel-grid" class="grid grid-cols-4 gap-1 text-center"></div>
+        <div class="mt-4 bg-white p-3 rounded shadow">
+          <div class="text-2xl font-bold text-center" id="current-char">ก</div>
+          <div class="text-sm text-center text-gray-500" id="current-info">gor gai 中辅音 /g/</div>
+          <canvas id="canvas" class="border w-full h-40 mt-2 bg-white"></canvas>
+          <div class="flex gap-2 mt-2">
+            <button onclick="clearCanvas()" class="bg-gray-300 px-3 py-1 rounded flex-1">清空</button>
+            <button onclick="speak(currentChar)" class="bg-blue-500 text-white px-3 py-1 rounded flex-1">🔊 真人读</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="tab-word" class="tab-content"><h2 class="text-xl font-bold mb-3">单词支柱</h2><div id="word-list" class="space-y-2"></div></div>
+      <div id="tab-sentence" class="tab-content"><h2 class="text-xl font-bold mb-3">句子支柱</h2><div id="sentence-box" class="bg-white p-3 rounded shadow"></div><div class="flex gap-2 mt-3"><button onclick="speakSentence()" class="bg-blue-500 text-white px-3 py-1 rounded">🔊 标准音</button><button onclick="toggleRecord()" id="rec-btn" class="bg-red-500 text-white px-3 py-1 rounded">🎤 录音</button></div><audio id="user-audio" controls class="w-full mt-2 hidden"></audio></div>
+      <div id="tab-read" class="tab-content"><h2 class="text-xl font-bold mb-3">浸泡支柱</h2><div id="read-sentence" class="bg-white p-4 rounded shadow text-lg leading-8"></div><div class="flex gap-2 mt-3"><button onclick="randomSentence()" class="bg-blue-500 text-white px-3 py-1 rounded">换一篇</button><button onclick="speakFullSentence()" class="bg-green-500 text-white px-3 py-1 rounded">连续播放</button></div></div>
+      <div id="tab-rayong" class="tab-content"><h2 class="text-xl font-bold mb-3">Rayong本地菜单 🍗</h2><div id="rayong-list" class="space-y-2"></div></div>
+      <div id="tab-seven" class="tab-content"><h2 class="text-xl font-bold mb-3">7-11购物 🛒</h2><div id="seven-list" class="space-y-2"></div></div>
+      <div id="tab-check" class="tab-content"><h2 class="text-xl font-bold mb-3">30天打卡</h2><div class="bg-white p-3 rounded shadow"><p>今日得分: <span id="today-score" class="font-bold text-blue-600">0</span> / 50</p><div class="w-full bg-gray-200 rounded-full h-2.5 mt-2"><div id="score-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div></div><div id="quiz-box" class="mt-4"></div></div></div>
+    </main>
+
+    <nav class="fixed bottom-0 w-full max-w-md bg-white border-t flex justify-around text-xs">
+      <button onclick="switchTab('letter')" class="p-2 flex-1">字母</button>
+      <button onclick="switchTab('word')" class="p-2 flex-1">单词</button>
+      <button onclick="switchTab('sentence')" class="p-2 flex-1">句子</button>
+      <button onclick="switchTab('read')" class="p-2 flex-1">阅读</button>
+      <button onclick="switchTab('rayong')" class="p-2 flex-1">菜单</button>
+      <button onclick="switchTab('seven')" class="p-2 flex-1">7-11</button>
+      <button onclick="switchTab('check')" class="p-2 flex-1">打卡</button>
+    </nav>
+  </div>
 
 <script>
-const data = [
-["สวัสดี","你好"],
-["ขอบคุณ","谢谢"],
-["เท่าไหร่","多少钱"],
-["ไปพัทยา เท่าไหร่","去芭提雅多少钱"],
-["ลดได้ไหม","能便宜吗"],
-["ใบขับขี่สากล ใช้ได้ไหม","国际驾照能用吗"],
-["ขอโทษครับ","对不起"],
-["ข้าวมันไก่","鸡油饭"],
-["ส้มตำ","木瓜沙拉"],
-["น้ำเปล่า","白水"],
-["คิดเงินด้วย","买单"],
-["จอดตรงนี้ครับ","停这里"],
-["เช่ามอเตอร์ไซค์ วันละเท่าไหร่","租摩托一天多少"],
-["เติมน้ำมัน 100 บาท","加100铢油"],
-["ห้องน้ำอยู่ไหนครับ","厕所在哪"],
-["อันนี้เท่าไหร่","这个多少"],
-["ไปตลาดระยองยังไง","去罗勇市场怎么去"],
-["ไม่เผ็ดครับ","不要辣"],
-["เอาอันนี้ครับ","要这个"],
-["มีห้องว่างไหมครับ","有空房吗"]
+// ===== 20条保命包 =====
+const emergency = [
+["สวัสดี","你好"],["ขอบคุณ","谢谢"],["เท่าไหร่","多少钱"],["ไปพัทยา เท่าไหร่","去芭提雅多少钱"],["ลดได้ไหม","能便宜吗"],["ใบขับขี่สากล ใช้ได้ไหม","国际驾照能用吗"],["ขอโทษครับ","对不起"],["ข้าวมันไก่","鸡油饭"],["ส้มตำ","木瓜沙拉"],["น้ำเปล่า","白水"],["คิดเงินด้วย","买单"],["จอดตรงนี้ครับ","停这里"],["เช่ามอเตอร์ไซค์ วันละเท่าไหร่","租摩托一天多少"],["เติมน้ำมัน 100 บาท","加100铢油"],["ห้องน้ำอยู่ไหนครับ","厕所在哪"],["อันนี้เท่าไหร่","这个多少"],["ไปตลาดระยองยังไง","去罗勇市场怎么去"],["ไม่เผ็ดครับ","不要辣"],["เอาอันนี้ครับ","要这个"],["มีห้องว่างไหมครับ","有空房吗"]
 ];
+function renderEmergency(){
+  const list = document.getElementById('emergency-list');
+  emergency.forEach(([th,zh])=>{
+    const div = document.createElement('div');
+    div.className = 'bg-white p-3 rounded-lg shadow flex justify-between items-center border-l-4 border-green-500';
+    div.innerHTML = `<div><div class="font-bold text-lg">${th}</div><div class="text-xs text-gray-500">${zh}</div></div><button class="bg-green-500 text-white px-3 py-2 rounded-full">▶️</button>`;
+    div.querySelector('button').onclick = ()=> speak(th);
+    list.appendChild(div);
+  });
+}
 
-const list = document.getElementById('list');
-data.forEach(([th, zh]) => {
-  const div = document.createElement('div');
-  div.className = 'card';
-  div.innerHTML = `<div><div class="th">${th}</div><div class="zh">${zh}</div></div><button>▶️ 播放</button>`;
-  div.querySelector('button').onclick = () => {
-    // 1. 优先播你生成的真人MP3
-    const url = `audio/${encodeURIComponent(th)}.mp3`;
-    const audio = new Audio(url);
-    audio.play().catch(()=>{
-      // 2. 如果MP3没上传， fallback到浏览器TTS
-      const u = new SpeechSynthesisUtterance(th);
-      u.lang='th-TH'; speechSynthesis.speak(u);
-    });
-  };
-  list.appendChild(div);
-});
+// ===== 44辅音 =====
+const consonants = [
+  {ch:'ก', name:'gor gai', type:'mid', sound:'/g/', eg:'ไก่ 鸡'}, {ch:'ข', name:'khor khai', type:'high', sound:'/kh/'}, {ch:'ฃ', name:'khor khuat', type:'high', sound:'/kh/ 废弃'}, {ch:'ค', name:'khor khwai', type:'low', sound:'/kh/'}, {ch:'ฅ', name:'khor khon', type:'low', sound:'/kh/ 废弃'}, {ch:'ฆ', name:'khor ra-khang', type:'low', sound:'/kh/'}, {ch:'ง', name:'ngor ngu', type:'low', sound:'/ng/'}, {ch:'จ', name:'jor jaan', type:'mid', sound:'/j/'}, {ch:'ฉ', name:'chor ching', type:'high', sound:'/ch/'}, {ch:'ช', name:'chor chaang', type:'low', sound:'/ch/'}, {ch:'ซ', name:'sor so', type:'low', sound:'/s/'}, {ch:'ฌ', name:'chor chəə', type:'low', sound:'/ch/'}, {ch:'ญ', name:'yor ying', type:'low', sound:'/y/'}, {ch:'ฎ', name:'dor cha-daa', type:'mid', sound:'/d/'}, {ch:'ฏ', name:'dtor bpa-dtak', type:'mid', sound:'/dt/'}, {ch:'ฐ', name:'thor than', type:'high', sound:'/th/'}, {ch:'ฑ', name:'thor mon-tho', type:'low', sound:'/th/'}, {ch:'ฒ', name:'thor phuu-thao', type:'low', sound:'/th/'}, {ch:'ณ', name:'nor naen', type:'low', sound:'/n/'}, {ch:'ด', name:'dor dek', type:'mid', sound:'/d/'}, {ch:'ต', name:'dtor dtao', type:'mid', sound:'/dt/'}, {ch:'ถ', name:'thor thung', type:'high', sound:'/th/'}, {ch:'ท', name:'thor thahan', type:'low', sound:'/th/'}, {ch:'ธ', name:'thor thong', type:'low', sound:'/th/'}, {ch:'น', name:'nor nuu', type:'low', sound:'/n/'}, {ch:'บ', name:'bor bai-mai', type:'mid', sound:'/b/'}, {ch:'ป', name:'bpor bplaa', type:'mid', sound:'/bp/'}, {ch:'ผ', name:'phor pheung', type:'high', sound:'/ph/'}, {ch:'ฝ', name:'for faa', type:'high', sound:'/f/'}, {ch:'พ', name:'phor phaan', type:'low', sound:'/ph/'}, {ch:'ฟ', name:'for fan', type:'low', sound:'/f/'}, {ch:'ภ', name:'phor sam-phao', type:'low', sound:'/ph/'}, {ch:'ม', name:'mor maa', type:'low', sound:'/m/'}, {ch:'ย', name:'yor yak', type:'low', sound:'/y/'}, {ch:'ร', name:'ror reua', type:'low', sound:'/r/'}, {ch:'ล', name:'lor ling', type:'low', sound:'/l/'}, {ch:'ว', name:'wor waen', type:'low', sound:'/w/'}, {ch:'ศ', name:'sor saa-laa', type:'high', sound:'/s/'}, {ch:'ษ', name:'sor reu-sii', type:'high', sound:'/s/'}, {ch:'ส', name:'sor seua', type:'high', sound:'/s/'}, {ch:'ห', name:'hor hiip', type:'high', sound:'/h/'}, {ch:'ฬ', name:'lor ju-laa', type:'low', sound:'/l/'}, {ch:'อ', name:'or aang', type:'mid', sound:'/ʔ/'}, {ch:'ฮ', name:'hor nok-huuk', type:'low', sound:'/h/'}
+];
+const vowels = [
+  {ch:'-ะ', name:'sara a', sound:'/a/ 短'}, {ch:'-ั-', name:'mai han-akat', sound:'/a/ 短'}, {ch:'-า', name:'sara aa', sound:'/aa/ 长'}, {ch:'-ิ', name:'sara i', sound:'/i/ 短'}, {ch:'-ี', name:'sara ii', sound:'/ii/ 长'}, {ch:'-ึ', name:'sara ue', sound:'/ue/ 短'}, {ch:'-ื', name:'sara uee', sound:'/uee/ 长'}, {ch:'-ุ', name:'sara u', sound:'/u/ 短'}, {ch:'-ู', name:'sara uu', sound:'/uu/ 长'}, {ch:'เ-ะ', name:'sara e', sound:'/e/ 短'}, {ch:'เ-', name:'sara ee', sound:'/ee/ 长'}, {ch:'แ-ะ', name:'sara ae', sound:'/ae/ 短'}, {ch:'แ-', name:'sara aae', sound:'/aae/ 长'}, {ch:'โ-ะ', name:'sara o', sound:'/o/ 短'}, {ch:'โ-', name:'sara oo', sound:'/oo/ 长'}, {ch:'เ-าะ', name:'sara ɔ', sound:'/ɔ/ 短'}, {ch:'-อ', name:'sara ɔɔ', sound:'/ɔɔ/ 长'}, {ch:'เ-อะ', name:'sara ə', sound:'/ə/ 短'}, {ch:'เ-อ', name:'sara əə', sound:'/əə/ 长'}, {ch:'เ-ียะ', name:'sara ia', sound:'/ia/ 短'}, {ch:'เ-ีย', name:'sara iia', sound:'/iia/ 长'}, {ch:'เ-ือะ', name:'sara uea', sound:'/uea/ 短'}, {ch:'เ-ือ', name:'sara ueaa', sound:'/ueaa/ 长'}, {ch:'-ัวะ', name:'sara ua', sound:'/ua/ 短'}, {ch:'-ัว', name:'sara uaa', sound:'/uaa/ 长'}, {ch:'ำ', name:'sara am', sound:'/am/'}, {ch:'ไ-', name:'sara ai mai ma-lai', sound:'/ai/'}, {ch:'ใ-', name:'sara ai mai muan', sound:'/ai/'}, {ch:'เ-า', name:'sara ao', sound:'/ao/'}, {ch:'ฤ', name:'ru', sound:'/rue/'}, {ch:'ฤา', name:'ruu', sound:'/ruu/'}, {ch:'ฦ', name:'lue', sound:'/lue/'}
+];
+const words = [{th:'สวัสดี',rt:'sà-wàt-dii',zh:'你好'}, {th:'ขอบคุณ',rt:'kɔ̀ɔp-kun',zh:'谢谢'}, {th:'ใช่',rt:'châi',zh:'是'}, {th:'ไม่ใช่',rt:'mâi châi',zh:'不是'}, {th:'เท่าไหร่',rt:'tâo rài',zh:'多少'}];
+const sentences = ['ผมขอข้าวผัดไก่ ไม่ใส่พริกครับ|pǒm kɔ̌ɔ kâao pàt gài mâi sài prík kráp|我要鸡肉炒饭，不要辣','ห้องน้ำอยู่ไหนครับ|hɔ̂ng náam yùu nǎi kráp|洗手间在哪','อันนี้เท่าไหร่ ลดได้ไหม|an níi tâo rài lót dâai mái|这个多少，能便宜吗','ไปตลาดระยองยังไง|bpai dtà-làat rá-yɔɔng yang-ngai|去罗勇市场怎么走','ไม่เผ็ดครับ|mâi pèt kráp|不要辣'];
+let currentChar = 'ก'; let mediaRecorder, audioChunks = []; let todayScore = 0;
+function init(){ renderEmergency(); renderConsonants(); renderVowels(); renderWords(); randomSentence(); loadTodayScore(); loadQuiz(); updateCharInfo(consonants[0]); }
+function renderConsonants(){ const grid = document.getElementById('consonant-grid'); consonants.forEach(c=>{ const btn = document.createElement('button'); btn.className = `letter-btn bg-white border p-1 rounded text-lg ${c.type==='mid'?'text-green-600':c.type==='high'?'text-red-500':'text-blue-500'}`; btn.textContent = c.ch; btn.onclick = ()=>{ currentChar = c.ch; updateCharInfo(c); speak(c.ch); }; grid.appendChild(btn); }); }
+function renderVowels(){ const grid = document.getElementById('vowel-grid'); vowels.forEach(v=>{ const btn = document.createElement('button'); btn.className = 'letter-btn bg-white border p-1 rounded text-sm'; btn.textContent = v.ch; btn.onclick = ()=>{ currentChar = v.ch; updateCharInfo(v); speak(v.ch.replace('-','ก')); }; grid.appendChild(btn); }); }
+function updateCharInfo(obj){ document.getElementById('current-char').textContent = obj.ch; document.getElementById('current-info').textContent = `${obj.name||''} ${obj.sound||''} ${obj.eg||''}`; }
+function switchTab(name){ document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active')); document.getElementById('tab-'+name).classList.add('active'); }
+const canvas = document.getElementById('canvas'); const ctx = canvas.getContext('2d'); let drawing = false;
+canvas.onmousedown = e=>{drawing=true; ctx.beginPath(); ctx.moveTo(e.offsetX,e.offsetY);}
+canvas.onmousemove = e=>{if(drawing){ctx.lineTo(e.offsetX,e.offsetY); ctx.stroke();}}
+canvas.onmouseup = ()=>{drawing=false; speak(currentChar);}
+function clearCanvas(){ctx.clearRect(0,0,canvas.width,canvas.height);}
+function renderWords(){ const list = document.getElementById('word-list'); list.innerHTML=''; words.forEach(w=>{ const div=document.createElement('div'); div.className='bg-white p-2 rounded shadow flex justify-between items-center'; div.innerHTML=`<div><div class="font-bold">${w.th}</div><div class="text-xs text-gray-500">${w.rt} | ${w.zh}</div></div><button onclick="speak('${w.th}')" class="bg-blue-100 px-2 py-1 rounded">🔊</button>`; list.appendChild(div); }); }
+function randomSentence(){ const idx=Math.floor(Math.random()*sentences.length); const [th,rt,zh]=sentences[idx].split('|'); document.getElementById('read-sentence').innerHTML = th.split(' ').map(w=>`<span class="word-span" onclick="speak('${w}')">${w}</span>`).join(' ') + `<div class="text-sm text-gray-500 mt-2">${rt}</div><div>${zh}</div>`; window.currentReadTh=th; document.getElementById('sentence-box').innerHTML=`<div class="text-lg">${th}</div><div class="text-sm text-gray-500">${rt}</div><div>${zh}</div>`; }
+function speakSentence(){ speak(sentences[0].split('|')[0]); }
+function speakFullSentence(){ speak(window.currentReadTh); }
+function loadTodayScore(){ const today=new Date().toDateString(); const saved=JSON.parse(localStorage.getItem('thai-score')||'{}'); todayScore=saved[today]||0; document.getElementById('today-score').textContent=todayScore; document.getElementById('score-bar').style.width=Math.min(todayScore*2,100)+'%'; }
+function loadQuiz(){ const quiz=words.sort(()=>0.5-Math.random()).slice(0,5); const box=document.getElementById('quiz-box'); box.innerHTML='<h3 class="font-bold mb-2">今日闯关</h3>'; quiz.forEach((q,i)=>{ const options=[...words].sort(()=>0.5-Math.random()).slice(0,3).map(w=>w.zh); if(!options.includes(q.zh)) options[0]=q.zh; box.innerHTML+=`<div class="mb-2">${i+1}. ${q.th} <select onchange="checkAns(this,'${q.zh}')" class="border rounded"><option>选择</option>${options.map(o=>`<option>${o}</option>`).join('')}</select></div>`; }); }
+function checkAns(select,correct){ if(select.value===correct){ select.className='border-green-500 bg-green-50'; todayScore+=10; const today=new Date().toDateString(); const saved=JSON.parse(localStorage.getItem('thai-score')||'{}'); saved[today]=todayScore; localStorage.setItem('thai-score',JSON.stringify(saved)); document.getElementById('today-score').textContent=todayScore; document.getElementById('score-bar').style.width=Math.min(todayScore*2,100)+'%'; } else { select.className='border-red-500 bg-red-50'; } }
+async function toggleRecord(){ const btn=document.getElementById('rec-btn'); if(!mediaRecorder){ const stream=await navigator.mediaDevices.getUserMedia({audio:true}); mediaRecorder=new MediaRecorder(stream); mediaRecorder.ondataavailable=e=>audioChunks.push(e.data); mediaRecorder.onstop=()=>{ const blob=new Blob(audioChunks,{type:'audio/webm'}); document.getElementById('user-audio').src=URL.createObjectURL(blob); document.getElementById('user-audio').classList.remove('hidden'); audioChunks=[]; } } if(mediaRecorder.state==='inactive'){ mediaRecorder.start(); btn.textContent='⏹ 停止'; } else { mediaRecorder.stop(); btn.textContent='🎤 录音'; } }
+
+// ===== 核心：真人MP3优先播放 =====
+function speak(text){
+  if(!text) return;
+  const clean = text.trim().replace(/-/g,'');
+  const url = `audio/${encodeURIComponent(clean)}.mp3`;
+  console.log('尝试播放', url);
+  const audio = new Audio(url);
+  audio.play().then(()=>{console.log('真人MP3成功',clean)}).catch(()=>{
+    console.log('没找到MP3，用TTS',clean);
+    const utter = new SpeechSynthesisUtterance(clean);
+    utter.lang = 'th-TH'; utter.rate = 0.9;
+    speechSynthesis.speak(utter);
+  });
+}
+init();
 </script>
 </body>
 </html>
